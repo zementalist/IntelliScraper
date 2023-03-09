@@ -6,6 +6,14 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+FEEDS = {
+    'test.csv': {
+        'format': 'csv',
+        'item_export_kwargs': {
+           'include_headers_line': False,
+        },
+    }
+}
 
 BOT_NAME = "IntelliScraper"
 
