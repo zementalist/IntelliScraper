@@ -3,7 +3,7 @@ import csv
 def read(filename):
     columns = []
     data = []
-    with open(f"../{filename}", 'r') as file:
+    with open(f"{filename}", 'r') as file:
       csvreader = csv.reader(file)
       for i, row in enumerate(csvreader):
         if i == 0:

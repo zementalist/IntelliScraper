@@ -3,6 +3,7 @@ import unicodedata
 import re
 from datetime import datetime
 from IntelliScraper import csv_reader
+from ..items import WikilinkItem
 
 
 class WikilinkSpider(scrapy.Spider):
@@ -85,12 +86,11 @@ class WikilinkSpider(scrapy.Spider):
         founded = self.getFounded(response)
         page_last_edit_date = self.getLastEditDate(response)
         
-        row = {
-            "company_name":company_name,
-            "founded":founded,
-            "industry":industries,
-            "products":products,
-            "page_last_edit_date":page_last_edit_date
-        }
-        print(row)
-        yield row
+        item = WikilinkItem()
+        item['company_name'] = company_name
+        item['founded'] = founded
+        item['industry'] = industries
+        item['product'] = products
+        item['page_last_edit_date'] = page_last_edit_date
+        
+        yield item

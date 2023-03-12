@@ -10,3 +10,10 @@ class IntelliscraperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
+
+class WikilinkItem(scrapy.Item):
+    company_name = scrapy.Field()
+    founded = scrapy.Field()
+    industry = scrapy.Field()
+    product = scrapy.Field()
+    page_last_edit_date = scrapy.Field()
