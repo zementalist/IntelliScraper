@@ -16,4 +16,5 @@ class WikilinkItem(scrapy.Item):
     founded = scrapy.Field()
     industry = scrapy.Field()
     product = scrapy.Field()
+    official_website = scrapy.Field()
     page_last_edit_date = scrapy.Field()

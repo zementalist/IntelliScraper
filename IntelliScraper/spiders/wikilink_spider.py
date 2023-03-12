@@ -64,6 +64,10 @@ class WikilinkSpider(scrapy.Spider):
         founded = min(founded_as_list_of_years)
         return founded
 
+    # Method to extract official website URL from Wiki (entity) page
+    def getOfficialWebsite(self, response):
+        return response.css(".infobox-data .url a::attr(href)").get()  
+
     # Method to extract edit date of the wiki page
     def getLastEditDate(self, response):
         page_last_edit_date = response.css("#footer-info-lastmod::text").get()
@@ -84,6 +88,7 @@ class WikilinkSpider(scrapy.Spider):
         industries = self.getIndustry(response)
         products = self.getProducts(response)
         founded = self.getFounded(response)
+        official_website = self.getOfficialWebsite(response)
         page_last_edit_date = self.getLastEditDate(response)
         
         item = WikilinkItem()
@@ -91,6 +96,7 @@ class WikilinkSpider(scrapy.Spider):
         item['founded'] = founded
         item['industry'] = industries
         item['product'] = products
+        item['official_website'] = official_website
         item['page_last_edit_date'] = page_last_edit_date
         
         yield item
