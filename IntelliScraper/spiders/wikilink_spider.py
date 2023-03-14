@@ -4,7 +4,8 @@ import re
 from datetime import datetime
 from IntelliScraper import csv_reader
 from ..items import WikilinkItem
-
+import json
+from ..helper import *
 
 class WikilinkSpider(scrapy.Spider):
     name = "wikilink"
@@ -12,7 +13,17 @@ class WikilinkSpider(scrapy.Spider):
     def __init__(self):
         super(WikilinkSpider)
         self.info_card_tr_pattern = "//table[@class='infobox vcard']/tbody/tr"
-        self.start_urls = csv_reader.pluck(csv_reader.read("wikicorps.csv"),"url")
+        self.data = read_list_companies("./wikicorps.json")
+        self.start_urls = list(map(lambda row: row['company_wiki_url'], self.data))
+        self.starting_time = datetime.now()
+
+    def closed(self, response):
+        self.ending_time = datetime.now()
+        duration = self.ending_time - self.starting_time
+        print(duration)
+
+
+
 
     def getCompanyName(self, response):
         name = response.css("#firstHeading span::text").get()
@@ -54,19 +65,27 @@ class WikilinkSpider(scrapy.Spider):
             .css("::text")\
             .extract()
         
-        # Remove non utf-8 characters
-        founded_as_str = unicodedata.normalize("NFKD", " ".join(founded_as_list))
+        if len(founded_as_list) > 0:
+            # Remove non utf-8 characters
+            founded_as_str = unicodedata.normalize("NFKD", " ".join(founded_as_list))
 
-        # Extract any 4 consecutive digits (recommended to use r'1\d{3}|2\d{3}')
-        founded_as_list_of_years = list(map(int, re.findall(r"\d{4}", founded_as_str)))
+            # Extract any 4 consecutive digits (recommended to use r'1\d{3}|2\d{3}')
+            founded_as_list_of_years = list(map(int, re.findall(r"\d{4}", founded_as_str)))
 
-        # Minimum year is the year of foundation
-        founded = min(founded_as_list_of_years)
-        return founded
+            # Minimum year is the year of foundation
+            founded = min(founded_as_list_of_years)
+            return founded
+        return None
 
     # Method to extract official website URL from Wiki (entity) page
     def getOfficialWebsite(self, response):
-        return response.css(".infobox-data .url a::attr(href)").get()  
+        url = response.css(".infobox-data .url a::attr(href)").get()  
+        if url is None:
+            return "https://null.com"
+        url = re.sub("https|http", "https", url).rstrip("/")
+        return url
+
+        
 
     # Method to extract edit date of the wiki page
     def getLastEditDate(self, response):
@@ -83,7 +102,11 @@ class WikilinkSpider(scrapy.Spider):
         
         return page_last_edit_date
 
+        
+
     def parse(self, response):
+
+
         company_name = self.getCompanyName(response)
         industries = self.getIndustry(response)
         products = self.getProducts(response)
@@ -91,12 +114,13 @@ class WikilinkSpider(scrapy.Spider):
         official_website = self.getOfficialWebsite(response)
         page_last_edit_date = self.getLastEditDate(response)
         
-        item = WikilinkItem()
+        item_id = list(map(lambda sample: sample['company_wiki_url'], self.data)).index(response.request.url)
+        item = self.data[item_id]
         item['company_name'] = company_name
         item['founded'] = founded
         item['industry'] = industries
         item['product'] = products
         item['official_website'] = official_website
         item['page_last_edit_date'] = page_last_edit_date
-        
         yield item
+        

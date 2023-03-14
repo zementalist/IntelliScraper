@@ -22,7 +22,7 @@ class CompanyWikiSpider(scrapy.Spider):
         # If index.php is found in url, it means 404 not found
         # if '/wiki' is not in url, usually it's the official website of business
         if "index.php" in text or "/wiki" not in text:
-            return None
+            return "https://null.com/"
         return "https://en.wikipedia.org" + text
 
     def parse(self, response):
@@ -30,6 +30,7 @@ class CompanyWikiSpider(scrapy.Spider):
         tables = response.css("h2 ~ .wikitable")
         items = []
         
+        # For each country (and a table), create an item with (id, country, operator, url)
         for country, table_number in zip(countries, range(1,len(tables)+1)):
             operators = response.xpath(f"//table[@class='wikitable' and position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/text()").extract()
             company_wiki_urls = response.xpath(f"//table[@class='wikitable' and position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/@href").extract() 

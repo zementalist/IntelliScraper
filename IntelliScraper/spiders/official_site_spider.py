@@ -1,16 +1,12 @@
 import scrapy
 from ..items import SocialMediaLinksItem
 from scrapy.http import HtmlResponse
-
+from ..helper import *
+import re
 
 class OfficialSiteSpider(scrapy.Spider):
     name = 'official_site'
-    start_urls = [
-        "https://www.orange.com/en",
-        "https://www.te.eg/wps/portal/te/Personal",
-        "https://web.vodafone.com.eg/"
 
-    ]
     def __init__(self):
         self.social_media_list = [
             "facebook",
@@ -21,6 +17,9 @@ class OfficialSiteSpider(scrapy.Spider):
             "youtube"
         ]
         self.social_media_not_found = []
+
+        self.data = read_list_companies("./wikicorpsv2.json")
+        self.start_urls = list(map(lambda row: row['official_website'], self.data))
 
 
 
@@ -55,7 +54,13 @@ class OfficialSiteSpider(scrapy.Spider):
         return item
 
     def parse(self, response):
-        item = self.getSocialMediaItem(response)
+        domain_regex = re.compile("^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)")
+
+        current_url_domain = domain_regex.match(response.request.url).group().rstrip("/").replace("www.","")
+        item_id = list(map(lambda sample: domain_regex.match(sample['official_website']).group().rstrip("/").replace("www.",""), self.data)).index(current_url_domain)
+        item = self.data[item_id]
+
+        item = self.getSocialMediaItem(response, item=item)
         if len(self.social_media_not_found) > 0:
             contact_urls = self.getContactPageUrls(response)
             for url in contact_urls:
