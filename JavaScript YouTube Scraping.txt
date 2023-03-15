@@ -1,0 +1,23 @@
+let reached_to_bottom = false;
+function scrollToBottom(){
+    const scrollingElement = (document.scrollingElement || document.body);
+	let old_scroll = scrollingElement.scrollHeight;
+scrollingElement.scrollTop = scrollingElement.scrollHeight;
+	let new_scroll = "what to compare";
+
+
+}
+
+setInterval(scrollToBottom, 500)
+
+
+let description = document.querySelector("#description-inline-expander #plain-snippet-text").innerText
+l = document.querySelectorAll(".style-scope ytd-comment-renderer #content #content-text")
+comments = Array.from(l).map(item => {return item.innerText})
+comments
+
+var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(comments));
+var dlAnchorElem = document.querySelector('a');
+dlAnchorElem.setAttribute("href",     dataStr     );
+dlAnchorElem.setAttribute("download", "scene.json");
+dlAnchorElem.click();
