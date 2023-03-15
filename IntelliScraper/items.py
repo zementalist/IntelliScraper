@@ -33,3 +33,6 @@ class CompanyWikiItem(scrapy.Item):
     country = scrapy.Field()
     operator = scrapy.Field()
     company_wiki_url = scrapy.Field()
+
+class AiscraperItem(scrapy.Item):
+    mix = scrapy.Field()

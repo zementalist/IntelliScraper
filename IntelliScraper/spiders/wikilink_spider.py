@@ -23,8 +23,6 @@ class WikilinkSpider(scrapy.Spider):
         print(duration)
 
 
-
-
     def getCompanyName(self, response):
         name = response.css("#firstHeading span::text").get()
 
@@ -77,6 +75,10 @@ class WikilinkSpider(scrapy.Spider):
             return founded
         return None
 
+    def start_requests(self):
+        for index, url in enumerate(self.start_urls):
+            yield scrapy.Request(url, meta={'index':index})
+    
     # Method to extract official website URL from Wiki (entity) page
     def getOfficialWebsite(self, response):
         url = response.css(".infobox-data .url a::attr(href)").get()  
@@ -105,8 +107,7 @@ class WikilinkSpider(scrapy.Spider):
         
 
     def parse(self, response):
-
-
+        
         company_name = self.getCompanyName(response)
         industries = self.getIndustry(response)
         products = self.getProducts(response)
@@ -114,8 +115,10 @@ class WikilinkSpider(scrapy.Spider):
         official_website = self.getOfficialWebsite(response)
         page_last_edit_date = self.getLastEditDate(response)
         
-        item_id = list(map(lambda sample: sample['company_wiki_url'], self.data)).index(response.request.url)
-        item = self.data[item_id]
+        item = self.data[response.meta['index']]
+        
+        print(f"#Request {response.meta['index']}", end='\r')
+
         item['company_name'] = company_name
         item['founded'] = founded
         item['industry'] = industries

@@ -21,6 +21,9 @@ class OfficialSiteSpider(scrapy.Spider):
         self.data = read_list_companies("./wikicorpsv2.json")
         self.start_urls = list(map(lambda row: row['official_website'], self.data))
 
+    def start_requests(self):
+        for index, url in enumerate(self.start_urls):
+            yield scrapy.Request(url, meta={'index':index})
 
 
     def getContactPageUrls(self, response):
@@ -54,12 +57,7 @@ class OfficialSiteSpider(scrapy.Spider):
         return item
 
     def parse(self, response):
-        domain_regex = re.compile("^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)")
-
-        current_url_domain = domain_regex.match(response.request.url).group().rstrip("/").replace("www.","")
-        item_id = list(map(lambda sample: domain_regex.match(sample['official_website']).group().rstrip("/").replace("www.",""), self.data)).index(current_url_domain)
-        item = self.data[item_id]
-
+        item = self.data[response.meta['index']]
         item = self.getSocialMediaItem(response, item=item)
         if len(self.social_media_not_found) > 0:
             contact_urls = self.getContactPageUrls(response)
