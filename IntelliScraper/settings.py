@@ -62,7 +62,9 @@ ROBOTSTXT_OBEY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    "IntelliScraper.middlewares.IntelliscraperDownloaderMiddleware": 543,
 #}
-
+RETRY_ENABLED = False
+DOWNLOAD_TIMEOUT = 5
+# HTTPERROR_ALLOW_ALL = True
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {

@@ -17,6 +17,7 @@ class WikilinkSpider(scrapy.Spider):
         self.start_urls = list(map(lambda row: row['company_wiki_url'], self.data))
         self.starting_time = datetime.now()
 
+
     def closed(self, response):
         self.ending_time = datetime.now()
         duration = self.ending_time - self.starting_time
@@ -77,8 +78,21 @@ class WikilinkSpider(scrapy.Spider):
 
     def start_requests(self):
         for index, url in enumerate(self.start_urls):
-            yield scrapy.Request(url, meta={'index':index})
+            yield scrapy.Request(url,
+                                errback=self.parse_error,
+                                dont_filter=True,
+                                meta={'index':index})
     
+    def parse_error(self, failure):
+        item = self.data[failure.request.meta['index']]
+        item['company_name'] = None
+        item['founded'] = None
+        item['industry'] = None
+        item['product'] = None
+        item['official_website'] = "https://null.com"
+        item['page_last_edit_date'] = None
+        yield item
+
     # Method to extract official website URL from Wiki (entity) page
     def getOfficialWebsite(self, response):
         url = response.css(".infobox-data .url a::attr(href)").get()  

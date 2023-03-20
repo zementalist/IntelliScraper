@@ -4,10 +4,12 @@ from scrapy.http import HtmlResponse
 from ..helper import *
 import re
 
+
 class OfficialSiteSpider(scrapy.Spider):
     name = 'official_site'
 
     def __init__(self):
+        self.timeout_limit_seconds = 3
         self.social_media_list = [
             "facebook",
             "twitter",
@@ -23,7 +25,14 @@ class OfficialSiteSpider(scrapy.Spider):
 
     def start_requests(self):
         for index, url in enumerate(self.start_urls):
-            yield scrapy.Request(url, meta={'index':index})
+            yield scrapy.Request(url,
+                errback=self.parse_error,
+                dont_filter=True,
+                meta={
+                'index':index,
+                
+                # 'download_timeout': self.timeout_limit_seconds
+                })
 
 
     def getContactPageUrls(self, response):
@@ -56,7 +65,16 @@ class OfficialSiteSpider(scrapy.Spider):
                 self.social_media_not_found.append(social_media_name)
         return item
 
+    def parse_error(self, failure):
+        item = self.data[failure.request.meta['index']]
+        for social in self.social_media_list:
+            item[social] = None
+        # print(item)
+        yield item
+
     def parse(self, response):
+        print(f"Request #{response.meta['index']}", end='\r')
+        # print(f"{response.request.url}")
         item = self.data[response.meta['index']]
         item = self.getSocialMediaItem(response, item=item)
         if len(self.social_media_not_found) > 0:

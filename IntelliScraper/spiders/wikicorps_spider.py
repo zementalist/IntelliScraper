@@ -17,6 +17,19 @@ class CompanyWikiSpider(scrapy.Spider):
         "http://en.wikipedia.org/wiki/List_of_mobile_network_operators_of_Europe"
         ]
     
+    # def start_requests(self):
+    #     for index, url in enumerate(self.start_urls):
+    #         yield scrapy.Request(url, errback=self.parse_error)
+        
+    # def parse_error(self, failure):
+    #     item = CompanyWikiItem()
+    #     item['id'] = self.id_counter
+    #     item['country'] = country
+    #     item['operator'] = self.clean_operator(operator)
+    #     item['company_wiki_url'] = self.process_wiki_url(company_wiki_url)
+        
+    #     yield item
+
     def clean_operator(self, text):
         text = re.sub(r" \(.*\)", "", text) # remove (anything between parantheses)
         return text
@@ -25,21 +38,24 @@ class CompanyWikiSpider(scrapy.Spider):
         # If index.php is found in url, it means 404 not found
         # if '/wiki' is not in url, usually it's the official website of business
         if "index.php" in text or "/wiki" not in text:
-            return f"https://null-{self.id_counter}.com/"
+            return f"https://null.com"
         return "https://en.wikipedia.org" + text
 
     def parse(self, response):
-        countries = response.xpath("//*[@class = 'mw-headline'][@id != 'See_also' and @id != 'References' and @id != 'External_links']//text()").extract()
+        countries = response.xpath("//*[@class = 'mw-headline'][@id != 'See_also' and @id != 'References' and @id != 'Footnotes' and @id != 'External_links']//text()").extract()
         tables = response.css("h2 ~ .wikitable")
         items = []
         # print(countries)
         # For each country (and a table), create an item with (id, country, operator, url)
         for country, table_number in zip(countries, range(1,len(tables)+1)):
 
-            operators = response.xpath(f"//table[@class='wikitable'][position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/text()").extract()
-            operators_without_url = response.xpath(f"//table[@class='wikitable'][position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/text()").extract()
+            operators = response.xpath(f"//table[contains(@class,'wikitable')][position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/text()").extract()
+            operators_without_url = response.xpath(f"//table[contains(@class,'wikitable')][position()={table_number}]/tbody/tr[position()>1]/td[position()=2][not(a)]/text()").extract()
             
-            company_wiki_urls = response.xpath(f"//table[@class='wikitable'][position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/@href").extract()
+            corrupted_operators_without_url = response.xpath(f"//table[contains(@class,'wikitable')][position()={table_number}]/tbody/tr[position()>1]/td[position()=2][not(br)]/text()").extract()
+            operators_without_url = list(set(operators_without_url) - set(corrupted_operators_without_url) - set([' ', '\n', '']))
+            
+            company_wiki_urls = response.xpath(f"//table[contains(@class,'wikitable')][position()={table_number}]/tbody/tr[position()>1]/td[position()=2]/a/@href").extract()
             company_without_wiki_url = [""] * len(operators_without_url)
 
             operators.extend(operators_without_url)
