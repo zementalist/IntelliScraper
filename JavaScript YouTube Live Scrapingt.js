@@ -19,6 +19,7 @@ if(reached_to_bottom){
     reached_to_bottom = false;
     if(patience < 1){
     clearInterval(interval_number);
+    document.querySelector("#description-inline-expander").click();    
     let description = document.querySelector("#description-inline-expander").innerText
     l = document.querySelectorAll(".style-scope ytd-comment-renderer #content #content-text")
     comments = Array.from(l).map(item => {return item.innerText})
