@@ -3,7 +3,7 @@ let reached_to_bottom = false;
 let interval_number = 0;
 let patience = 10;
 const delay = ms => new Promise(res => setTimeout(res, ms));
-
+let file_is_downloaded = false;
 async function scrollToBottom(){
     document.querySelector("video").pause();
     const scrollingElement = (document.scrollingElement || document.body);
@@ -14,12 +14,11 @@ scrollingElement.scrollTop = scrollingElement.scrollHeight -5;
     reached_to_bottom = old_scroll == new_scroll;
 
     
-if(reached_to_bottom){
+if(reached_to_bottom && !file_is_downloaded){
     patience -= 1;
     reached_to_bottom = false;
     if(patience < 1){
     clearInterval(interval_number);
-    document.querySelector("#description-inline-expander").click();    
     let description = document.querySelector("#description-inline-expander").innerText
     l = document.querySelectorAll(".style-scope ytd-comment-renderer #content #content-text")
     comments = Array.from(l).map(item => {return item.innerText})
