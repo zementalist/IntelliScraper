@@ -1,0 +1,56 @@
+html, body, #app {
+  height: 100%;
+}
+
+.we-foreground-color {
+  color: #5c2d91;
+}
+.we-border-color {
+  border-color: #5c2d917e !important;
+}
+.we-background-color {
+  background-color:#5c2d91;
+  color: white;;
+}
+
+.we-hover:hover, .active, .we-active:active {
+  background-color: #3e1271 !important;
+  color: white !important;
+ 
+}
+.we-btn {
+  background-color:#5c2d91;
+  color: white;;
+}
+.we-btn:hover, .we-btn:active {
+  background-color: #3e1271 !important;
+  color: white !important;
+}
+
+.we-border {
+  border: 1px solid #3e1271;
+  border-radius: 3px;
+}
+.we-focus-red:focus {
+  background-color: #FC2947;
+  color: white;;
+}
+
+.we-border { 
+  border-color: #5c2d917e !important;
+}
+.we-focus:focus {
+  background-color: #3e1271 !important;
+  color: white;
+  box-shadow: 0 0 0 0.25rem #5c2d91 !important;
+  border-color: #5c2d917e !important;
+}
+
+.we-checked:checked {
+  background-color: #5c2d91;
+    border-color: #3e1271;
+}
+
+.text-we {
+  color: #5c2d91;
+}

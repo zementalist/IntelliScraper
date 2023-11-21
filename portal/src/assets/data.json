@@ -1,0 +1,30 @@
+{
+    "countries": [
+        {
+            "name": "All Countries",
+            "value":0
+        },
+        {
+            "name": "Egypt",
+            "value":1
+        },
+        {
+            "name": "Saudi Arabia",
+            "value":2
+        }
+    ],
+    "industries": [
+        {
+            "name": "Telecommunications",
+            "value":0
+        },
+        {
+            "name": "Software House",
+            "value":1
+        },
+        {
+            "name": "Marketing",
+            "value":2
+        }
+    ]
+}

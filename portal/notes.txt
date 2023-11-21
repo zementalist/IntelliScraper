@@ -1,0 +1,12 @@
+1- Detect similar campaigns on different social platforms
+//2- save data in files OR database
+3- scrape user's data (i.e. location)
+#4- Scrape links within campaigns
+
+
+// 2023-05-21
+
+1- Postpone authentication (admin/user)
+2- Focus on scheduling using OS
+3- Find leads (users' data), fetch any available data
+4- Solve captcha
